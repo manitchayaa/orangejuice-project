@@ -1,57 +1,107 @@
 import React, { useState,useEffect } from 'react';
+
+import { supabase } from '../../service/supabaseClient'
+
+
 // import './OrangeShop.css';
 const HomePage = () => {
-  const [count, setCount] = useState(1);
-  const pricePerUnit = 35;
 
-  const handleOrder = () => {
-    alert(`กำลังไปที่หน้าชำระเงินสำหรับน้ำส้ม ${count} ขวด`);
-  };
-  
+  const [addressProfile, setAddressProfile] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    getAddressProfile()
+  }, [])
+
+    async function getAddressProfile() {
+        setLoading(false)
+        console.log("Hi")
+        try{
+          const res = await supabase
+            .from("Address_Profile")
+            .select("*")
+            .order("created_at", { ascending: true})
+            console.log(res.data)
+          setAddressProfile(res.data)
+        } catch (error) {
+          console.error(error)
+        } finally {
+          setLoading(true)
+          
+        }
+    }
+
   return (
-    <div className="bg-amber-500 text-white p-4 rounded-lg">
-      <header className="header">
-        <h1>สดจากสวน 🍊</h1>
-        <p>น้ำส้มคั้นสด 100% ไม่ใส่น้ำตาล</p>
-      </header>
-
-      <main className="product-card">
-        <img 
-          src="https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=400" 
-          alt="Orange Juice" 
-          className="product-image"
-        />
-        <p style={{fontWeight: 'bold', color: '#f97316'}}>ขวดละ {pricePerUnit} บาท</p>
-
-        <div className="counter-group">
-          <button 
-            className="btn-circle btn-minus"
-            onClick={() => setCount(Math.max(1, count - 1))}
-          >
-            -
-          </button>
-          
-          <span className="quantity-text">{count}</span>
-          
-          <button 
-            className="btn-circle btn-plus"
-            onClick={() => setCount(count + 1)}
-          >
-            +
-          </button>
+<div className="p-4">
+      {/* ส่วนควบคุมการแสดงผล Loading */}
+      {!loading ? (
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">กำลังโหลดข้อมูล...</span>
         </div>
-      </main>
-
-      <footer className="footer-card">
-        <div className="price-summary">
-          <span className="total-label">ยอดรวม</span>
-          <span className="total-amount">{count * pricePerUnit}.-</span>
+      ) : (
+        <div className="relative overflow-x-auto shadow-xl sm:rounded-xl border border-gray-100">
+          <table className="w-full text-sm text-left text-gray-600">
+            {/* Header: ปรับสีให้เข้มขึ้นและเพิ่มตัวหนา */}
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100 border-b border-gray-200">
+              <tr>
+                <th scope="col" className="px-6 py-4 font-bold">Name</th>
+                <th scope="col" className="px-6 py-4 font-bold">Receiver Name</th>
+                <th scope="col" className="px-6 py-4 font-bold">Phone Number</th>
+                <th scope="col" className="px-6 py-4 font-bold">sub_district</th>
+                <th scope="col" className="px-6 py-4 font-bold">district</th>
+                <th scope="col" className="px-6 py-4 font-bold">province</th>
+                <th scope="col" className="px-6 py-4 font-bold">postal_code</th>
+                <th scope="col" className="px-6 py-4 font-bold">note</th>
+              </tr>
+            </thead>
+            
+            <tbody className="divide-y divide-gray-100">
+              {addressProfile && addressProfile.length > 0 ? (
+                addressProfile.map((i) => (
+                  <tr 
+                    key={i.id} 
+                    className="bg-white hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {i.name}
+                    </td>
+                    <td className="px-6 py-4">
+                      {i.receiver_name}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded border border-gray-300">
+                        {i.phone_number}
+                      </span>
+                    </td>
+                   <td className="px-6 py-4">
+                      {i.sub_district}
+                    </td>
+                   <td className="px-6 py-4">
+                      {i.district}
+                    </td>
+                   <td className="px-6 py-4">
+                      {i.province}
+                    </td>
+                   <td className="px-6 py-4">
+                      {i.postal_code}
+                    </td>
+                   <td className="px-6 py-4">
+                      {i.note}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-6 py-10 text-center text-gray-400 italic">
+                    ไม่พบข้อมูลที่อยู่
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-        
-        <button className="order-button" onClick={handleOrder}>
-          สั่งซื้อเลย 🛒
-        </button>
-      </footer>
+      )}
     </div>
   );
 };
