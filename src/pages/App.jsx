@@ -36,11 +36,19 @@
 
 // export default App
 import { Routes, Route } from "react-router-dom"
+import { useEffect ,useState} from "react";
 import HomePage from "./HomePage"
+import LoginPage from "./AuthPage/Login/LoginPage";
+
+import { supabase } from "../service/supabaseClient";
 function App() {
+
+  
+
   return (
     <Routes>
       <Route path="/" element={<HomePage/>}/>
+      <Route path="/login" element={<LoginPage/>}/>
     </Routes>
   )
 }
