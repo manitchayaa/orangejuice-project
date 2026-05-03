@@ -1,55 +1,29 @@
-// import { useEffect, useState } from 'react'
-// import { supabase } from '../service/supabaseClient'
-
-// // รวม route
-// function App() {
-//   const [addresses, setAddresses] = useState([]);
-
-//   useEffect(() => {
-//     getAddresses()
-//   }, [])
-
-//   async function getAddresses() {
-//     const { data, error } = await supabase
-//       .from('Products') // ชื่อตาราง
-//       .select('*')            // ดึงทุกฟิลด์
-    
-//     if (error) {
-//       console.error('Error fetching:', error)
-//     } else {
-//       setAddresses(data)
-//       console.log(data)
-//     }
-//   }
-//   console.log("มะมี",addresses)
-
-//   return (
-//     <div>
-//       {addresses.map(addr => (
-//         <div key={addr.id}>
-//           <strong>{addr.profile_name}</strong> - {addr.receiver_name}
-//         </div>
-//       ))}
-//     </div>
-//   )
-// }
-
-// export default App
-import { Routes, Route } from "react-router-dom"
-import { useEffect ,useState} from "react";
-import HomePage from "./HomePage"
+import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import HomePage from "./HomePage";
 import LoginPage from "./AuthPage/Login/LoginPage";
+import { useTheme } from "../store/useTheme";
 
-import { supabase } from "../service/supabaseClient";
 function App() {
+  const { theme } = useTheme();
 
-  
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage/>}/>
-      <Route path="/login" element={<LoginPage/>}/>
-    </Routes>
-  )
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </div>
+  );
 }
+
+
 export default App;
