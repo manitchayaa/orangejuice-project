@@ -1,9 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import HomePage from "./HomePage";
-import LoginPage from "./AuthPage/Login/LoginPage";
 import { useTheme } from "../store/useTheme";
-
+import Privacy from "./Privacy";
 function App() {
   const { theme } = useTheme();
 
@@ -19,7 +18,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
     </div>
   );
