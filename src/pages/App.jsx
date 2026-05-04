@@ -2,7 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import HomePage from "./HomePage";
 import { useTheme } from "../store/useTheme";
+
 import Privacy from "./Privacy";
+import DeleteData from "./DeleteData";
 function App() {
   const { theme } = useTheme();
 
@@ -19,6 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/delete-data" element={<DeleteData />} />
       </Routes>
     </div>
   );
