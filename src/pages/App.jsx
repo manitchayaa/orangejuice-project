@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/delete-data" element={<DeleteData />} />
+        <Route path="/delete" element={<DeleteData />} />
       </Routes>
     </div>
   );
