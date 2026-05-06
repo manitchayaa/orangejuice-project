@@ -66,9 +66,13 @@ const Appbar = () => {
   };
 
   return (
-    <nav className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 relative transition-colors duration-300">
+    <nav className="
+      w-full 
+    bg-white dark:bg-gray-900
+      border-b border-gray-200 dark:border-gray-800 
+      relative transition-colors duration-300">
       {/* Container ครอบเนื้อหาเพื่อให้ชิดกลาง */}
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6">
         {/* Modal Login */}
         {isLoginModalOpen && (
           <SelectAuthModal
@@ -81,20 +85,14 @@ const Appbar = () => {
         {/* --- ส่วน Nav ด้านซ้าย (Logo + เมนู) --- */}
         <div className="flex items-center gap-6">
           <h1
-            className="text-2xl font-bold text-purple-500 cursor-pointer mr-2"
+            className="text-4xl font-bold text-purple-500 cursor-pointer mr-2"
             onClick={() => navigate("/")}
           >
             PLUTORY
           </h1>
 
           {/* เมนูนำทาง */}
-          <div className="hidden md:flex items-center gap-5">
-            <p
-              className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-500 transition-colors"
-              onClick={() => navigate("/most-popular-planets")}
-            >
-              ยอดนิยม
-            </p>
+          <div className="text-lg md:flex items-center gap-5">
             <p
               className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-500 transition-colors"
               onClick={() => navigate("/weekly-planets")}
@@ -103,9 +101,9 @@ const Appbar = () => {
             </p>
             <p
               className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-500 transition-colors"
-              onClick={() => navigate("/my-planets")}
+              onClick={() => navigate("/most-popular-planets")}
             >
-              โลกของฉัน
+              อันดับ
             </p>
           </div>
         </div>
@@ -115,7 +113,7 @@ const Appbar = () => {
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-600 dark:text-gray-300 "
+            className="cursor-pointer p-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 text-gray-600 dark:text-gray-300 "
             aria-label="Toggle theme"
           >
             {theme === "light" ? (
@@ -156,26 +154,23 @@ const Appbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="px-4 py-2 rounded-full border
-                   border-gray-200
-                    dark:border-gray-700 
-                    text-sm font-bold
-                     hover:bg-gray-50
-                      dark:hover:bg-gray-800
-                       text-gray-800
-                        dark:text-gray-200 
-                        transition-all 
-                        cursor-pointer"
+                  className="cursor-pointer px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 transition-all"
                 >
                   {user?.user_metadata?.full_name || "User"}
                 </button>
 
                 {isOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2">
+                    <button
+                      onClick={() => navigate("/my-planets")}
+                      className="cursor-pointer w-full px-4 py-2 text-left text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      โลกของฉัน
+                    </button>
                     <hr className="my-1 border-gray-100 dark:border-gray-700" />
                     <button
                       onClick={handleLogout}
-                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer"
+                      className="cursor-pointer w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                     >
                       ออกจากระบบ
                     </button>

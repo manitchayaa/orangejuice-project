@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import HomePage from "./HomePage";
 import { useTheme } from "../store/useTheme";
+
+import HomePage from "./HomePage";
 
 import Privacy from "./Privacy";
 import DeleteData from "./DeleteData";
@@ -20,6 +21,11 @@ function App() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <Routes>
         <Route path="/" element={<HomePage />} />
+
+        <Route path="/weekly-planets" element={<HomePage />} />
+        <Route path="/most-popular-planets" element={<HomePage />} />
+        <Route path="/my-planets" element={<HomePage />} />
+
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/delete" element={<DeleteData />} />
       </Routes>
