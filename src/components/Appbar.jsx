@@ -3,7 +3,8 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "../service/supabaseClient";
 import { useTheme } from "../store/useTheme";
 
-import FacebookIcon from "../assets/icons/Facebook_Logo_Primary.png"
+//component
+import { SelectAuthModal } from "./SelectAuthModal";
 const Appbar = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -70,49 +71,11 @@ const Appbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
         {/* Modal Login */}
         {isLoginModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm w-full relative shadow-xl">
-              <button
-                onClick={() => setIsLoginModalOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-              >
-                ✕
-              </button>
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-                  เข้าสู่ระบบมาสนุกกับโลกในจินตนาการ!
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  เตรียมตัวเข้าสู่โลกของแต่ละครีเอเตอร์ และสนุกไปกับการสำรวจ!
-                </p>
-              </div>
-             <div className="flex flex-col gap-4">
-               <button
-                onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-gray-700 dark:text-gray-200 font-medium"
-              >
-                <img
-                  src="https://www.svgrepo.com/show/475656/google-color.svg"
-                  alt="Google"
-                  className="w-5 h-5"
-                />
-                เข้าสู่ระบบด้วย Google
-              </button>
-              <button
-                onClick={handleFacebookLogin}
-                className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-gray-700 dark:text-gray-200 font-medium"
-              >
-                <img
-                  src={FacebookIcon}
-                  alt="Facebook"
-                  className="w-5 h-5"
-                />
-                เข้าสู่ระบบด้วย Facebook
-              </button>
-             </div>
-               
-            </div>
-          </div>
+          <SelectAuthModal
+            setIsLoginModalOpen={setIsLoginModalOpen}
+            handleGoogleLogin={handleGoogleLogin}
+            handleFacebookLogin={handleFacebookLogin}
+          />
         )}
 
         {/* --- ส่วน Nav ด้านซ้าย (Logo + เมนู) --- */}
@@ -121,7 +84,7 @@ const Appbar = () => {
             className="text-2xl font-bold text-purple-500 cursor-pointer mr-2"
             onClick={() => navigate("/")}
           >
-            PLUTO
+            PLUTORY
           </h1>
 
           {/* เมนูนำทาง */}
@@ -158,7 +121,7 @@ const Appbar = () => {
             {theme === "light" ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 "
+                className="h-5 w-5  cursor-pointer"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -173,7 +136,7 @@ const Appbar = () => {
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-5 w-5  cursor-pointer"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -193,7 +156,16 @@ const Appbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 transition-all"
+                  className="px-4 py-2 rounded-full border
+                   border-gray-200
+                    dark:border-gray-700 
+                    text-sm font-bold
+                     hover:bg-gray-50
+                      dark:hover:bg-gray-800
+                       text-gray-800
+                        dark:text-gray-200 
+                        transition-all 
+                        cursor-pointer"
                 >
                   {user?.user_metadata?.full_name || "User"}
                 </button>
@@ -203,7 +175,7 @@ const Appbar = () => {
                     <hr className="my-1 border-gray-100 dark:border-gray-700" />
                     <button
                       onClick={handleLogout}
-                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                      className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer"
                     >
                       ออกจากระบบ
                     </button>
@@ -214,7 +186,7 @@ const Appbar = () => {
           ) : (
             <button
               onClick={() => setIsLoginModalOpen(true)}
-              className="px-4 py-1.5 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-bold hover:opacity-80 transition-opacity"
+              className="px-4 py-1.5 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-bold hover:opacity-80 transition-opacity cursor-pointer"
             >
               เข้าสู่ระบบ
             </button>
