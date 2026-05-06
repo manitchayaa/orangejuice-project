@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+// NavLink คือ รู้ว่า เราอยู่หน้าไหนอยู่
+// useNavigate คือ กดแล้วไปหน้าไหน เปลี่ยน route แต่ไม่รู้ว่าเราอยู่หน้าไหนอยู่
+import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../service/supabaseClient";
 import { useTheme } from "../store/useTheme";
@@ -66,13 +68,19 @@ const Appbar = () => {
   };
 
   return (
-    <nav className="
+    <nav
+      className="
+      fixed 
       w-full 
-    bg-white dark:bg-gray-900
+     bg-white dark:bg-[#0f0f0f]
       border-b border-gray-200 dark:border-gray-800 
-      relative transition-colors duration-300">
+      transition-colors duration-300
+      h-16
+     
+     "
+    >
       {/* Container ครอบเนื้อหาเพื่อให้ชิดกลาง */}
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
         {/* Modal Login */}
         {isLoginModalOpen && (
           <SelectAuthModal
@@ -85,26 +93,37 @@ const Appbar = () => {
         {/* --- ส่วน Nav ด้านซ้าย (Logo + เมนู) --- */}
         <div className="flex items-center gap-6">
           <h1
-            className="text-4xl font-bold text-purple-500 cursor-pointer mr-2"
+            className="text-3xl font-bold text-purple-500 cursor-pointer mr-2"
             onClick={() => navigate("/")}
           >
             PLUTORY
           </h1>
 
           {/* เมนูนำทาง */}
-          <div className="text-lg md:flex items-center gap-5">
-            <p
-              className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-500 transition-colors"
-              onClick={() => navigate("/weekly-planets")}
+          <div className="text-lg md:flex items-center gap-5   leading-none">
+            <NavLink
+              to="category"
+              className={({ isActive }) =>
+                `font-medium text-gray-800 dark:text-gray-200 
+                  cursor-pointer
+                 hover:text-purple-400 
+                 transition-colors 
+                  leading-none
+                 ${isActive ? "text-purple-400 dark:text-purple-400" : ""}
+                 
+                 `
+              }
             >
               หมวดหมู่
-            </p>
-            <p
-              className="font-bold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-500 transition-colors"
-              onClick={() => navigate("/most-popular-planets")}
+            </NavLink>
+            <NavLink
+              to="most-popular-planets"
+              className={({ isActive }) =>
+                `font-medium text-gray-800 dark:text-gray-200 cursor-pointer hover:text-purple-400 transition-colors ${isActive ? "text-purple-200 dark:text-purple-200" : ""}`
+              }
             >
               อันดับ
-            </p>
+            </NavLink>
           </div>
         </div>
 
