@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Modal } from "../../components/ui/Modal";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
+import { helpers } from "../../utils/helpers";
 
 export const ProjectEditor = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export const ProjectEditor = () => {
   const [formData, setFormData] = useState({
     title_en: "", title_th: "",
     description_en: "", description_th: "",
-    content_en: "", content_th: "",
+
     tech_stack: "",
     tags: "",
     demo_url: "",
@@ -50,12 +51,17 @@ export const ProjectEditor = () => {
   const handleOpenModal = (item = null) => {
     if (item) {
       setEditingItem(item);
+      const parseArray = (val) => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        return helpers.parseJSON(val, []);
+      };
+
       setFormData({
         title_en: item.title_en || "", title_th: item.title_th || "",
         description_en: item.description_en || "", description_th: item.description_th || "",
-        content_en: item.content_en || "", content_th: item.content_th || "",
-        tech_stack: item.tech_stack ? item.tech_stack.join(", ") : "",
-        tags: item.tags ? item.tags.join(", ") : "",
+        tech_stack: parseArray(item.tech_stack).join(", "),
+        tags: parseArray(item.tags).join(", "),
         demo_url: item.demo_url || "",
         github_url: item.github_url || "",
         year: item.year || "",
@@ -64,7 +70,7 @@ export const ProjectEditor = () => {
       setEditingItem(null);
       setFormData({
         title_en: "", title_th: "", description_en: "", description_th: "",
-        content_en: "", content_th: "", tech_stack: "", tags: "",
+        tech_stack: "", tags: "",
         demo_url: "", github_url: "", year: "",
       });
     }
@@ -84,13 +90,15 @@ export const ProjectEditor = () => {
       let image_url = editingItem?.image_url;
 
       if (file) {
-        image_url = await storageService.uploadFile("projects", user.id, file);
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/project_${Date.now()}.${fileExt}`;
+        await storageService.uploadFile("projects", filePath, file);
+        image_url = storageService.getPublicUrl("projects", filePath);
       }
 
       const payload = {
         title_en: formData.title_en, title_th: formData.title_th,
         description_en: formData.description_en, description_th: formData.description_th,
-        content_en: formData.content_en, content_th: formData.content_th,
         tech_stack: formData.tech_stack.split(",").map(i => i.trim()).filter(Boolean),
         tags: formData.tags.split(",").map(i => i.trim()).filter(Boolean),
         demo_url: formData.demo_url,
@@ -179,6 +187,15 @@ export const ProjectEditor = () => {
               onChange={(e) => setFile(e.target.files[0])}
               className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
             />
+            {(file || editingItem?.image_url) && (
+              <div className="mt-3 h-40 w-full max-w-sm rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <img 
+                  src={file ? URL.createObjectURL(file) : editingItem.image_url} 
+                  alt="Preview" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -201,12 +218,7 @@ export const ProjectEditor = () => {
             <Input label={lang === "th" ? "ปีที่ทำ" : "Year"} name="year" value={formData.year} onChange={handleChange} placeholder="e.g. 2024" />
           </div>
 
-          {formTab === "en" ? (
-            <Input label={lang === "th" ? "เนื้อหาแบบละเอียด (EN)" : "Full Content (EN)"} type="textarea" name="content_en" value={formData.content_en} onChange={handleChange} />
-          ) : (
-            <Input label={lang === "th" ? "เนื้อหาแบบละเอียด (TH)" : "Full Content (TH)"} type="textarea" name="content_th" value={formData.content_th} onChange={handleChange} />
-          )}
-          
+
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} disabled={saving}>{t("dashboard.cancel")}</Button>
             <Button type="submit" disabled={saving}>{saving ? (lang === "th" ? "กำลังบันทึก..." : "Saving...") : t("dashboard.save")}</Button>

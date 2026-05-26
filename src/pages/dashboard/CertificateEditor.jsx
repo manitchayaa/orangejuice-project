@@ -77,7 +77,10 @@ export const CertificateEditor = () => {
       let image_url = editingItem?.image_url;
 
       if (file) {
-        image_url = await storageService.uploadFile("certificates", user.id, file);
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/cert_${Date.now()}.${fileExt}`;
+        await storageService.uploadFile("certificates", filePath, file);
+        image_url = storageService.getPublicUrl("certificates", filePath);
       }
 
       const payload = {
@@ -169,6 +172,15 @@ export const CertificateEditor = () => {
               onChange={(e) => setFile(e.target.files[0])}
               className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
             />
+            {(file || editingItem?.image_url) && (
+              <div className="mt-3 h-40 w-full max-w-sm rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <img 
+                  src={file ? URL.createObjectURL(file) : editingItem.image_url} 
+                  alt="Preview" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
