@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const useTheme = create(
+export const useThemeStore = create(
   persist(
     (set) => ({
-      theme: "light",
+      theme: "dark", // default theme
       toggleTheme: () =>
         set((state) => ({
           theme: state.theme === "light" ? "dark" : "light",
@@ -12,7 +12,7 @@ export const useTheme = create(
       setTheme: (theme) => set({ theme }),
     }),
     {
-      name: "theme-storage",
+      name: "portfolio-theme",
     }
   )
 );
