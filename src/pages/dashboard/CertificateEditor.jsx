@@ -19,10 +19,10 @@ export const CertificateEditor = () => {
   const [formTab, setFormTab] = useState("en");
   
   const [formData, setFormData] = useState({
-    name_en: "", name_th: "",
+    title_en: "", title_th: "",
     issuer_en: "", issuer_th: "",
-    date: "",
-    url: "",
+    issue_date: "",
+    credential_url: "",
   });
   
   const [file, setFile] = useState(null);
@@ -49,16 +49,16 @@ export const CertificateEditor = () => {
     if (item) {
       setEditingItem(item);
       setFormData({
-        name_en: item.name_en || "", name_th: item.name_th || "",
+        title_en: item.title_en || "", title_th: item.title_th || "",
         issuer_en: item.issuer_en || "", issuer_th: item.issuer_th || "",
-        date: item.date || "",
-        url: item.url || "",
+        issue_date: item.issue_date || "",
+        credential_url: item.credential_url || "",
       });
     } else {
       setEditingItem(null);
       setFormData({
-        name_en: "", name_th: "", issuer_en: "", issuer_th: "",
-        date: "", url: "",
+        title_en: "", title_th: "", issuer_en: "", issuer_th: "",
+        issue_date: "", credential_url: "",
       });
     }
     setFile(null);
@@ -84,10 +84,10 @@ export const CertificateEditor = () => {
       }
 
       const payload = {
-        name_en: formData.name_en, name_th: formData.name_th,
+        title_en: formData.title_en, title_th: formData.title_th,
         issuer_en: formData.issuer_en, issuer_th: formData.issuer_th,
-        date: formData.date,
-        url: formData.url,
+        issue_date: formData.issue_date,
+        credential_url: formData.credential_url,
         image_url,
       };
 
@@ -139,9 +139,9 @@ export const CertificateEditor = () => {
               )}
             </div>
             <div className="p-4 flex flex-col flex-grow">
-              <h3 className="font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">{item.name_en || item.name_th}</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">{item.title_en || item.title_th}</h3>
               <p className="text-sm text-gray-500">{item.issuer_en || item.issuer_th}</p>
-              <p className="text-xs text-gray-400 mb-4">{item.date}</p>
+              <p className="text-xs text-gray-400 mb-4">{item.issue_date}</p>
               <div className="mt-auto flex justify-end gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
                 <button onClick={() => handleOpenModal(item)} className="p-2.5 text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 rounded-full transition-colors border border-blue-100 dark:border-blue-500/20 shadow-sm" title={lang === "th" ? "แก้ไข" : "Edit"}>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -186,18 +186,18 @@ export const CertificateEditor = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formTab === "en" ? (
               <>
-                <Input label={lang === "th" ? "ชื่อใบประกาศ (EN)" : "Certificate Name (EN)"} name="name_en" value={formData.name_en} onChange={handleChange} required />
+                <Input label={lang === "th" ? "ชื่อใบประกาศ (EN)" : "Certificate Name (EN)"} name="title_en" value={formData.title_en} onChange={handleChange} required />
                 <Input label={lang === "th" ? "หน่วยงานที่ออกให้ (EN)" : "Issuer Organization (EN)"} name="issuer_en" value={formData.issuer_en} onChange={handleChange} required />
               </>
             ) : (
               <>
-                <Input label={lang === "th" ? "ชื่อใบประกาศ (TH)" : "Certificate Name (TH)"} name="name_th" value={formData.name_th} onChange={handleChange} />
+                <Input label={lang === "th" ? "ชื่อใบประกาศ (TH)" : "Certificate Name (TH)"} name="title_th" value={formData.title_th} onChange={handleChange} />
                 <Input label={lang === "th" ? "หน่วยงานที่ออกให้ (TH)" : "Issuer Organization (TH)"} name="issuer_th" value={formData.issuer_th} onChange={handleChange} />
               </>
             )}
 
-            <Input label={lang === "th" ? "วันที่ได้รับ" : "Date Issued"} name="date" value={formData.date} onChange={handleChange} placeholder="e.g. Aug 2023" />
-            <Input label={lang === "th" ? "ลิงก์อ้างอิง (ถ้ามี)" : "Credential URL (Optional)"} type="url" name="url" value={formData.url} onChange={handleChange} />
+            <Input label={lang === "th" ? "วันที่ได้รับ" : "Date Issued"} name="issue_date" value={formData.issue_date} onChange={handleChange} placeholder="e.g. Aug 2023" />
+            <Input label={lang === "th" ? "ลิงก์อ้างอิง (ถ้ามี)" : "Credential URL (Optional)"} type="url" name="credential_url" value={formData.credential_url} onChange={handleChange} />
           </div>
           
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">

@@ -9,6 +9,42 @@ import { Card } from "../../components/ui/Card";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 import { ShareButton } from "../../components/ShareButton";
 
+const splitFullName = (fullName = "") => {
+  const normalizedName = fullName.trim().replace(/\s+/g, " ");
+  if (!normalizedName) return { firstName: "", lastName: "" };
+
+  const [firstName, ...lastNameParts] = normalizedName.split(" ");
+  return {
+    firstName,
+    lastName: lastNameParts.join(" "),
+  };
+};
+
+const joinFullName = (firstName = "", lastName = "") =>
+  [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
+
+const createProfileFormData = (profile = {}) => {
+  const thaiName = splitFullName(profile.full_name_th || "");
+  const englishName = splitFullName(profile.full_name_en || "");
+
+  return {
+    username: profile.username || "",
+    first_name_th: profile.first_name_th || thaiName.firstName,
+    last_name_th: profile.last_name_th || thaiName.lastName,
+    first_name_en: profile.first_name_en || englishName.firstName,
+    last_name_en: profile.last_name_en || englishName.lastName,
+    title_th: profile.title_th || "",
+    title_en: profile.title_en || "",
+    bio_th: profile.bio_th || "",
+    bio_en: profile.bio_en || "",
+    email: profile.email || "",
+    phone: profile.phone || "",
+    location_th: profile.location_th || "",
+    location_en: profile.location_en || "",
+    is_available: profile.is_available ?? true,
+  };
+};
+
 export const ProfileEditor = () => {
   const { user } = useAuth();
   const { t, lang, toggleLang } = useTranslation();
@@ -22,7 +58,8 @@ export const ProfileEditor = () => {
   // Initialize with empty data
   const [formData, setFormData] = useState({
     username: "",
-    full_name_th: "", full_name_en: "",
+    first_name_th: "", last_name_th: "",
+    first_name_en: "", last_name_en: "",
     title_th: "", title_en: "",
     bio_th: "", bio_en: "",
     email: "", phone: "",
@@ -42,23 +79,10 @@ export const ProfileEditor = () => {
         // Only populate from server if there's no draft
         const draft = sessionStorage.getItem("profile_draft_v2");
         if (draft) {
-          setFormData(JSON.parse(draft));
+          setFormData(createProfileFormData(JSON.parse(draft)));
           setIsDirty(true);
         } else {
-          setFormData({
-            username: profile.username || "",
-            full_name_th: profile.full_name_th || "",
-            full_name_en: profile.full_name_en || "",
-            title_th: profile.title_th || "",
-            title_en: profile.title_en || "",
-            bio_th: profile.bio_th || "",
-            bio_en: profile.bio_en || "",
-            email: profile.email || "",
-            phone: profile.phone || "",
-            location_th: profile.location_th || "",
-            location_en: profile.location_en || "",
-            is_available: profile.is_available ?? true,
-          });
+          setFormData(createProfileFormData(profile));
         }
         setAvatarPreview(profile.avatar_url || "");
       } catch (error) {
@@ -117,8 +141,23 @@ export const ProfileEditor = () => {
         avatar_url = storageService.getPublicUrl("avatars", filePath);
       }
 
+      const profilePayload = {
+        username: formData.username,
+        full_name_th: joinFullName(formData.first_name_th, formData.last_name_th),
+        full_name_en: joinFullName(formData.first_name_en, formData.last_name_en),
+        title_th: formData.title_th,
+        title_en: formData.title_en,
+        bio_th: formData.bio_th,
+        bio_en: formData.bio_en,
+        email: formData.email,
+        phone: formData.phone,
+        location_th: formData.location_th,
+        location_en: formData.location_en,
+        is_available: formData.is_available,
+      };
+
       await profileService.updateProfile(user.id, {
-        ...formData,
+        ...profilePayload,
         avatar_url,
       });
 
@@ -142,6 +181,7 @@ export const ProfileEditor = () => {
 
   if (loading) return <LoadingSpinner />;
 
+  console.log(user);
   return (
     <Card className="animate-fade-in-up">
       <div className="flex items-center justify-between mb-6">
@@ -196,19 +236,21 @@ export const ProfileEditor = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input label={lang === "th" ? "ชื่อผู้ใช้ (URL Slug)" : "Username (URL Slug)"} name="username" value={formData.username} onChange={handleChange} required />
           <Input label={lang === "th" ? "อีเมล" : "Email"} type="email" name="email" value={formData.email} onChange={handleChange} />
           
           {formTab === "en" ? (
             <>
-              <Input label={lang === "th" ? "ชื่อ-นามสกุล (EN)" : "Full Name (EN)"} name="full_name_en" value={formData.full_name_en} onChange={handleChange} required />
+              <Input label={lang === "th" ? "ชื่อ (EN)" : "First Name (EN)"} name="first_name_en" value={formData.first_name_en} onChange={handleChange} required />
+              <Input label={lang === "th" ? "นามสกุล (EN)" : "Last Name (EN)"} name="last_name_en" value={formData.last_name_en} onChange={handleChange} required />
               <Input label={lang === "th" ? "ตำแหน่งงาน (EN)" : "Job Title (EN)"} name="title_en" value={formData.title_en} onChange={handleChange} placeholder="e.g. System Engineer" />
               <Input label={lang === "th" ? "สถานที่อยู่ (EN)" : "Location (EN)"} name="location_en" value={formData.location_en} onChange={handleChange} />
             </>
           ) : (
             <>
-              <Input label={lang === "th" ? "ชื่อ-นามสกุล (TH)" : "Full Name (TH)"} name="full_name_th" value={formData.full_name_th} onChange={handleChange} />
+              <Input label={lang === "th" ? "ชื่อ (TH)" : "First Name (TH)"} name="first_name_th" value={formData.first_name_th} onChange={handleChange} />
+              <Input label={lang === "th" ? "นามสกุล (TH)" : "Last Name (TH)"} name="last_name_th" value={formData.last_name_th} onChange={handleChange} />
               <Input label={lang === "th" ? "ตำแหน่งงาน (TH)" : "Job Title (TH)"} name="title_th" value={formData.title_th} onChange={handleChange} placeholder="เช่น วิศวกรระบบ" />
               <Input label={lang === "th" ? "สถานที่อยู่ (TH)" : "Location (TH)"} name="location_th" value={formData.location_th} onChange={handleChange} />
             </>
