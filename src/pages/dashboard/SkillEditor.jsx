@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { portfolioService } from "../../service/portfolioService";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -8,11 +8,11 @@ import { Input } from "../../components/ui/Input";
 import { Modal } from "../../components/ui/Modal";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 
-export const SkillEditor = () => {
-  const { user } = useAuth();
+const SkillEditor = () => {
+  const { user, loading: authLoading } = useAuth();
   const { t, lang } = useTranslation();
   const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formTab, setFormTab] = useState("en");
@@ -22,23 +22,33 @@ export const SkillEditor = () => {
     category_th: "",
     proficiency: 50,
   });
+  const fetchedUserIdRef = useRef(null);
 
   useEffect(() => {
-    fetchData();
-  }, [user]);
+    const userId = user?.id;
+    if (!userId || fetchedUserIdRef.current === userId) return;
 
-  const fetchData = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const data = await portfolioService.getItems("skills", user.id);
-      setSkills(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    let isMounted = true;
+
+    Promise.resolve().then(async () => {
+      setLoading(true);
+      try {
+        const data = await portfolioService.getItems("skills", userId);
+        if (isMounted) {
+          setSkills(data);
+          fetchedUserIdRef.current = userId;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
 
   const handleOpenModal = (item = null) => {
     if (item) {
@@ -70,12 +80,13 @@ export const SkillEditor = () => {
     e.preventDefault();
     try {
       if (editingItem) {
-        await portfolioService.updateItem("skills", editingItem.id, formData);
+        const updatedItem = await portfolioService.updateItem("skills", editingItem.id, formData);
+        setSkills((prev) => prev.map((item) => item.id === editingItem.id ? updatedItem : item));
       } else {
-        await portfolioService.addItem("skills", { ...formData, profile_id: user.id });
+        const newItem = await portfolioService.addItem("skills", { ...formData, profile_id: user.id });
+        setSkills((prev) => [newItem, ...prev]);
       }
       setIsModalOpen(false);
-      fetchData();
     } catch (error) {
       console.error(error);
     }
@@ -85,16 +96,17 @@ export const SkillEditor = () => {
     if (!window.confirm(t("dashboard.confirmDelete"))) return;
     try {
       await portfolioService.deleteItem("skills", id);
-      fetchData();
+      setSkills((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (authLoading || loading) return <LoadingSpinner />;
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <Card>
+      <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.manageSkills")}</h2>
         <Button onClick={() => handleOpenModal()} size="sm">
@@ -148,6 +160,7 @@ export const SkillEditor = () => {
         </form>
       </Modal>
     </div>
+    </Card>
   );
 };
 

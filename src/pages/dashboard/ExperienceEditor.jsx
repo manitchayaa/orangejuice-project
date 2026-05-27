@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { portfolioService } from "../../service/portfolioService";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -9,10 +9,10 @@ import { Modal } from "../../components/ui/Modal";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 
 export const ExperienceEditor = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, lang } = useTranslation();
   const [experience, setExperience] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formTab, setFormTab] = useState("en");
@@ -24,23 +24,33 @@ export const ExperienceEditor = () => {
     start_date: "", end_date: "",
     type: "internship",
   });
+  const fetchedUserIdRef = useRef(null);
 
   useEffect(() => {
-    fetchData();
-  }, [user]);
+    const userId = user?.id;
+    if (!userId || fetchedUserIdRef.current === userId) return;
 
-  const fetchData = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const data = await portfolioService.getItems("experience", user.id);
-      setExperience(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    let isMounted = true;
+
+    Promise.resolve().then(async () => {
+      setLoading(true);
+      try {
+        const data = await portfolioService.getItems("experience", userId);
+        if (isMounted) {
+          setExperience(data);
+          fetchedUserIdRef.current = userId;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
 
   const handleOpenModal = (item = null) => {
     if (item) {
@@ -72,12 +82,13 @@ export const ExperienceEditor = () => {
     e.preventDefault();
     try {
       if (editingItem) {
-        await portfolioService.updateItem("experience", editingItem.id, formData);
+        const updatedItem = await portfolioService.updateItem("experience", editingItem.id, formData);
+        setExperience((prev) => prev.map((item) => item.id === editingItem.id ? updatedItem : item));
       } else {
-        await portfolioService.addItem("experience", { ...formData, profile_id: user.id });
+        const newItem = await portfolioService.addItem("experience", { ...formData, profile_id: user.id });
+        setExperience((prev) => [newItem, ...prev]);
       }
       setIsModalOpen(false);
-      fetchData();
     } catch (error) {
       console.error(error);
     }
@@ -87,16 +98,17 @@ export const ExperienceEditor = () => {
     if (!window.confirm(t("dashboard.confirmDelete"))) return;
     try {
       await portfolioService.deleteItem("experience", id);
-      fetchData();
+      setExperience((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (authLoading || loading) return <LoadingSpinner />;
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <Card>
+      <div className="space-y-6 animate-fade-in-up">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.manageExperience")}</h2>
         <Button onClick={() => handleOpenModal()} size="sm">+ {t("dashboard.add")}</Button>
@@ -172,6 +184,7 @@ export const ExperienceEditor = () => {
         </form>
       </Modal>
     </div>
+    </Card>
   );
 };
 

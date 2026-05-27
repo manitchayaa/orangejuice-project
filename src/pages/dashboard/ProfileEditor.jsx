@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { profileService } from "../../service/profileService";
 import { storageService } from "../../service/storageService";
@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 import { ShareButton } from "../../components/ShareButton";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const splitFullName = (fullName = "") => {
   const normalizedName = fullName.trim().replace(/\s+/g, " ");
@@ -22,6 +23,13 @@ const splitFullName = (fullName = "") => {
 
 const joinFullName = (firstName = "", lastName = "") =>
   [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
+
+const scrollToTop = () => {
+  requestAnimationFrame(() => {
+    document.querySelector("main")?.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+};
 
 const createProfileFormData = (profile = {}) => {
   const thaiName = splitFullName(profile.full_name_th || "");
@@ -45,9 +53,10 @@ const createProfileFormData = (profile = {}) => {
   };
 };
 
-export const ProfileEditor = () => {
+const ProfileEditor = () => {
   const { user } = useAuth();
-  const { t, lang, toggleLang } = useTranslation();
+  const setUser = useAuthStore((state) => state.setUser);
+  const { t, lang } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -129,6 +138,7 @@ export const ProfileEditor = () => {
       const isAvailable = await profileService.checkUsernameAvailable(formData.username, user.id);
       if (!isAvailable) {
         setMessage({ type: "error", text: "Username is already taken." });
+        scrollToTop();
         setSaving(false);
         return;
       }
@@ -164,16 +174,25 @@ export const ProfileEditor = () => {
       sessionStorage.removeItem("profile_draft_v2");
       setIsDirty(false);
       setMessage({ type: "success", text: lang === "th" ? "บันทึกโปรไฟล์เรียบร้อยแล้ว!" : "Profile saved successfully!" });
+      scrollToTop();
+      
       setTimeout(() => setMessage(null), 3000);
       
       // Update user metadata for navigation link
       if(user && user.user_metadata) {
-         user.user_metadata.username = formData.username;
+        setUser({
+          ...user,
+          user_metadata: {
+            ...user.user_metadata,
+            username: formData.username,
+          },
+        });
       }
       
     } catch (error) {
       console.error(error);
       setMessage({ type: "error", text: "Error saving profile." });
+      scrollToTop();
     } finally {
       setSaving(false);
     }
@@ -181,7 +200,6 @@ export const ProfileEditor = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  console.log(user);
   return (
     <Card className="animate-fade-in-up">
       <div className="flex items-center justify-between mb-6">
@@ -198,12 +216,6 @@ export const ProfileEditor = () => {
           </div>
         )}
       </div>
-      
-      <div className="flex border-b border-gray-200 dark:border-gray-800 mb-6">
-        <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "en" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("en")}>{lang === "th" ? "ภาษาอังกฤษ" : "English"}</button>
-        <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "th" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("th")}>{lang === "th" ? "ภาษาไทย" : "Thai"}</button>
-      </div>
-
       {message && (
         <div className={`fixed top-24 right-6 z-50 p-4 rounded-xl shadow-lg border animate-fade-in-up ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-gray-800 dark:border-green-900/50 dark:text-green-400' : 'bg-red-50 border-red-200 text-red-700 dark:bg-gray-800 dark:border-red-900/50 dark:text-red-400'}`}>
           <div className="flex items-center gap-3">
@@ -236,29 +248,12 @@ export const ProfileEditor = () => {
           </div>
         </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label={lang === "th" ? "ชื่อผู้ใช้ (URL Slug)" : "Username (URL Slug)"} name="username" value={formData.username} onChange={handleChange} required />
-          <Input label={lang === "th" ? "อีเมล" : "Email"} type="email" name="email" value={formData.email} onChange={handleChange} />
+         <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+          <Input className="md:col-span-3" label={lang === "th" ? "ชื่อผู้ใช้ (URL Slug)" : "Username (URL Slug)"} name="username" value={formData.username} onChange={handleChange} required />
+          <Input className="md:col-span-3" label={lang === "th" ? "อีเมล" : "Email"} type="email" name="email" value={formData.email} onChange={handleChange} />
+          <Input className="md:col-span-3" label={lang === "th" ? "เบอร์โทรศัพท์" : "Phone"} name="phone" value={formData.phone} onChange={handleChange} />
           
-          {formTab === "en" ? (
-            <>
-              <Input label={lang === "th" ? "ชื่อ (EN)" : "First Name (EN)"} name="first_name_en" value={formData.first_name_en} onChange={handleChange} required />
-              <Input label={lang === "th" ? "นามสกุล (EN)" : "Last Name (EN)"} name="last_name_en" value={formData.last_name_en} onChange={handleChange} required />
-              <Input label={lang === "th" ? "ตำแหน่งงาน (EN)" : "Job Title (EN)"} name="title_en" value={formData.title_en} onChange={handleChange} placeholder="e.g. System Engineer" />
-              <Input label={lang === "th" ? "สถานที่อยู่ (EN)" : "Location (EN)"} name="location_en" value={formData.location_en} onChange={handleChange} />
-            </>
-          ) : (
-            <>
-              <Input label={lang === "th" ? "ชื่อ (TH)" : "First Name (TH)"} name="first_name_th" value={formData.first_name_th} onChange={handleChange} />
-              <Input label={lang === "th" ? "นามสกุล (TH)" : "Last Name (TH)"} name="last_name_th" value={formData.last_name_th} onChange={handleChange} />
-              <Input label={lang === "th" ? "ตำแหน่งงาน (TH)" : "Job Title (TH)"} name="title_th" value={formData.title_th} onChange={handleChange} placeholder="เช่น วิศวกรระบบ" />
-              <Input label={lang === "th" ? "สถานที่อยู่ (TH)" : "Location (TH)"} name="location_th" value={formData.location_th} onChange={handleChange} />
-            </>
-          )}
-          
-          <Input label={lang === "th" ? "เบอร์โทรศัพท์" : "Phone"} name="phone" value={formData.phone} onChange={handleChange} />
-          
-          <div className="flex items-center gap-3 py-2 md:mt-8">
+          <div className="flex items-center gap-3 py-2 md:col-span-3 md:mt-8">
             <input 
               type="checkbox" 
               id="is_available" 
@@ -272,7 +267,28 @@ export const ProfileEditor = () => {
             </label>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="flex border-b border-gray-200 dark:border-gray-800 md:col-span-6">
+            <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "en" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("en")}>{lang === "th" ? "ภาษาอังกฤษ" : "English"}</button>
+            <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "th" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("th")}>{lang === "th" ? "ภาษาไทย" : "Thai"}</button>
+          </div>
+          
+          {formTab === "en" ? (
+            <>
+              <Input className="md:col-span-3" label={lang === "th" ? "ชื่อ (EN)" : "First Name (EN)"} name="first_name_en" value={formData.first_name_en} onChange={handleChange} required />
+              <Input className="md:col-span-3" label={lang === "th" ? "นามสกุล (EN)" : "Last Name (EN)"} name="last_name_en" value={formData.last_name_en} onChange={handleChange} required />
+              <Input className="md:col-span-3" label={lang === "th" ? "ตำแหน่งงาน (EN)" : "Job Title (EN)"} name="title_en" value={formData.title_en} onChange={handleChange} placeholder="e.g. System Engineer" />
+              <Input className="md:col-span-3" label={lang === "th" ? "สถานที่อยู่ (EN)" : "Location (EN)"} name="location_en" value={formData.location_en} onChange={handleChange} />
+            </>
+          ) : (
+            <>
+              <Input className="md:col-span-3" label={lang === "th" ? "ชื่อ (TH)" : "First Name (TH)"} name="first_name_th" value={formData.first_name_th} onChange={handleChange} />
+              <Input className="md:col-span-3" label={lang === "th" ? "นามสกุล (TH)" : "Last Name (TH)"} name="last_name_th" value={formData.last_name_th} onChange={handleChange} />
+              <Input className="md:col-span-3" label={lang === "th" ? "ตำแหน่งงาน (TH)" : "Job Title (TH)"} name="title_th" value={formData.title_th} onChange={handleChange} placeholder="เช่น วิศวกรระบบ" />
+              <Input className="md:col-span-3" label={lang === "th" ? "สถานที่อยู่ (TH)" : "Location (TH)"} name="location_th" value={formData.location_th} onChange={handleChange} />
+            </>
+          )}
+          
+          <div className="md:col-span-6">
             {formTab === "en" ? (
               <Input label={lang === "th" ? "ประวัติย่อ / แนะนำตัว (EN)" : "Bio (EN)"} type="textarea" name="bio_en" value={formData.bio_en} onChange={handleChange} />
             ) : (
