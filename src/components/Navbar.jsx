@@ -18,6 +18,7 @@ export const Navbar = () => {
   const dropdownRef = useRef(null);
 
   const isPortfolioView = location.pathname.startsWith("/portfolio/") && username;
+  const isDashboard = location.pathname.startsWith("/dashboard");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -37,7 +38,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full h-16 bg-white/80 dark:bg-[#12121a]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-40 transition-colors duration-300">
+      <nav className={`${isDashboard ? "relative" : "fixed top-0 left-0"} w-full h-16 bg-white/80 dark:bg-[#12121a]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-40 transition-colors duration-300`}>
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           
           {/* Logo & Portfolio Navigation */}

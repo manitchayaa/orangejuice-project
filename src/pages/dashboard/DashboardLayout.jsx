@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "../../hooks/useTranslation";
+
 import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 
 export const DashboardLayout = () => {
@@ -20,27 +22,49 @@ export const DashboardLayout = () => {
   }
 
   const navItems = [
-    { path: "/dashboard", label: t("dashboard.editProfile"), exact: true },
-    { path: "/dashboard/education", label: t("dashboard.manageEducation") },
-    { path: "/dashboard/experience", label: t("dashboard.manageExperience") },
-    { path: "/dashboard/skills", label: t("dashboard.manageSkills") },
-    { path: "/dashboard/projects", label: t("dashboard.manageProjects") },
-    { path: "/dashboard/certificates", label: t("dashboard.manageCertificates") },
+    {
+      path: "/dashboard",
+      label: t("dashboard.editProfile"),
+      exact: true,
+    },
+    {
+      path: "/dashboard/education",
+      label: t("dashboard.manageEducation"),
+    },
+    {
+      path: "/dashboard/experience",
+      label: t("dashboard.manageExperience"),
+    },
+    {
+      path: "/dashboard/skills",
+      label: t("dashboard.manageSkills"),
+    },
+    {
+      path: "/dashboard/projects",
+      label: t("dashboard.manageProjects"),
+    },
+    {
+      path: "/dashboard/certificates",
+      label: t("dashboard.manageCertificates"),
+    },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
+    <div className="flex items-start gap-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
       <div className="flex flex-col md:flex-row gap-8">
-        
         {/* Sidebar */}
         <div className="w-full md:w-64 shrink-0">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden sticky top-24 shadow-sm">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Dashboard
+              </h2>
+
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                 {user.email}
               </p>
             </div>
+
             <nav className="p-3 space-y-1">
               {navItems.map((item) => (
                 <NavLink
@@ -58,26 +82,42 @@ export const DashboardLayout = () => {
                   {item.label}
                 </NavLink>
               ))}
+
               <div className="my-2 border-t border-gray-100 dark:border-gray-800" />
+
               {user.user_metadata?.username && (
                 <button
-                  onClick={() => navigate(`/portfolio/${user.user_metadata.username}`)}
+                  onClick={() =>
+                    navigate(`/portfolio/${user.user_metadata.username}`)
+                  }
                   className="w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
                   </svg>
+
                   {t("nav.myPortfolio")}
                 </button>
               )}
             </nav>
           </div>
         </div>
+      </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
-          <Outlet />
-        </div>
+      {/* Main Content Area */}
+     <div className="flex-1 min-w-0 overflow-x-hidden">
+        <Outlet />
       </div>
     </div>
   );

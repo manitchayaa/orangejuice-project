@@ -34,9 +34,9 @@ const App = () => {
   }, [theme]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0f] flex flex-col transition-colors duration-300">
+  <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0f] flex flex-col transition-colors duration-300">
       <Navbar />
-      <main className="flex-grow pt-16">
+      <main className="flex-grow ">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           
