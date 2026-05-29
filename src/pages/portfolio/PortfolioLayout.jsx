@@ -1,4 +1,3 @@
-import React from "react";
 import { Outlet, useParams, NavLink } from "react-router-dom";
 import { usePortfolio } from "../../hooks/usePortfolio";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -8,7 +7,7 @@ import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
 export const PortfolioLayout = () => {
   const { username } = useParams();
   const portfolioData = usePortfolio(username);
-  const { profile, loading, error } = portfolioData;
+  const { profile, projects = [], certificates = [], experience = [], loading, error } = portfolioData;
   const { t, lang } = useTranslation();
 
   if (loading) {
@@ -26,10 +25,23 @@ export const PortfolioLayout = () => {
 
   const fullName = lang === "th" ? (profile.full_name_th || profile.full_name_en) : (profile.full_name_en || profile.full_name_th);
   const title = lang === "th" ? (profile.title_th || profile.title_en) : (profile.title_en || profile.title_th);
+  const location = lang === "th" ? profile.location_th : profile.location_en || profile.location_th;
+  const navItems = [
+    { to: `/portfolio/${username}`, label: t("nav.home"), end: true },
+    { to: `/portfolio/${username}/resume`, label: t("nav.resume") },
+    { to: `/portfolio/${username}/project`, label: t("nav.project") },
+    { to: `/portfolio/${username}/certificate`, label: t("nav.certificate") },
+  ];
+  const stats = [
+    { label: t("nav.project"), value: projects.length },
+    { label: t("nav.certificate"), value: certificates.length },
+    { label: t("nav.resume"), value: experience.length },
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-24 pb-12 animate-fade-in-up">
       {/* Portfolio Header */}
+      <header className="relative overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#101018]"></header>
       <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-12 gap-6 bg-white dark:bg-gray-900/40 p-8 rounded-3xl border border-gray-200 dark:border-gray-800">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <img 
@@ -65,38 +77,31 @@ export const PortfolioLayout = () => {
       </div>
 
       {/* Portfolio Navigation Tabs */}
-      <div className="flex overflow-x-auto gap-2 sm:gap-6 mb-8 border-b border-gray-200 dark:border-gray-800 scrollbar-hide">
-        <NavLink 
-          to={`/portfolio/${username}`} 
-          end 
-          className={({isActive}) => `whitespace-nowrap px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-[1px] ${isActive ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"}`}
-        >
-          {t("nav.home")}
-        </NavLink>
-        <NavLink 
-          to={`/portfolio/${username}/resume`} 
-          className={({isActive}) => `whitespace-nowrap px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-[1px] ${isActive ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"}`}
-        >
-          {t("nav.resume")}
-        </NavLink>
-        <NavLink 
-          to={`/portfolio/${username}/project`} 
-          className={({isActive}) => `whitespace-nowrap px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-[1px] ${isActive ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"}`}
-        >
-          {t("nav.project")}
-        </NavLink>
-        <NavLink 
-          to={`/portfolio/${username}/certificate`} 
-          className={({isActive}) => `whitespace-nowrap px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-[1px] ${isActive ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"}`}
-        >
-          {t("nav.certificate")}
-        </NavLink>
-      </div>
+      <nav className="sticky top-16 z-30 -mx-4 mt-5 border-y border-gray-200 bg-gray-50/90 px-4 py-3 backdrop-blur-md dark:border-gray-800 dark:bg-[#0a0a0f]/90 sm:mx-0 sm:rounded-2xl sm:border">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                  isActive
+                    ? "bg-purple-600 text-white shadow-sm shadow-purple-600/20 dark:bg-purple-500"
+                    : "text-gray-500 hover:bg-white hover:text-gray-950 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
 
       {/* Main Content Area */}
-      <div className="bg-white dark:bg-gray-900/20 rounded-3xl min-h-[50vh] p-4 md:p-8">
+      <main className="min-h-[50vh] pt-10">
         <Outlet context={portfolioData} />
-      </div>
+      </main>
     </div>
   );
 };
