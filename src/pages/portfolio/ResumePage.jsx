@@ -1,11 +1,10 @@
-import React from "react";
 import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "../../hooks/useTranslation";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 
 export const ResumePage = () => {
-  const { profile, education, experience, skills } = useOutletContext();
+  const { education, experience, skills } = useOutletContext();
   const { t, lang } = useTranslation();
 
   const techSkills = skills.filter(s => s.category_en?.toLowerCase().includes('tech') || s.category_th?.includes('เทคนิค'));
@@ -13,6 +12,13 @@ export const ResumePage = () => {
 
   const getLocalized = (item, field) => {
     return lang === "th" ? (item[`${field}_th`] || item[`${field}_en`]) : (item[`${field}_en`] || item[`${field}_th`]);
+  };
+
+  const formatEducationYear = (year) => {
+    if (!/^\d{4}$/.test(String(year))) return year;
+    const numericYear = Number(year);
+    if (lang === "th") return String(numericYear >= 2400 ? numericYear : numericYear + 543);
+    return String(numericYear >= 2400 ? numericYear - 543 : numericYear);
   };
 
   return (
@@ -31,11 +37,17 @@ export const ResumePage = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                 </span>
                 <Badge variant="tag" className="mb-2">
-                  {edu.start_year} - {edu.end_year}
+                  {formatEducationYear(edu.start_year)} - {formatEducationYear(edu.end_year)}
                 </Badge>
                 <h4 className="text-xl font-bold text-gray-900 dark:text-white">{getLocalized(edu, 'degree')}</h4>
                 <p className="text-gray-600 dark:text-gray-400 font-medium mb-1">{getLocalized(edu, 'school')}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500">{getLocalized(edu, 'field')}</p>
+                <div className="space-y-0.5 text-sm text-gray-500 dark:text-gray-500">
+                  {getLocalized(edu, 'faculty') && <p>{getLocalized(edu, 'faculty')}</p>}
+                  {getLocalized(edu, 'major') && <p>{getLocalized(edu, 'major')}</p>}
+                  {!getLocalized(edu, 'faculty') && !getLocalized(edu, 'major') && getLocalized(edu, 'field') && (
+                    <p>{getLocalized(edu, 'field')}</p>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{getLocalized(edu, 'description')}</p>
               </div>
             ))}

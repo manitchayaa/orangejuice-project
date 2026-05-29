@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export const Modal = ({ isOpen, onClose, title, children, maxWidth = "max-w-2xl" }) => {
+export const Modal = ({ isOpen, onClose, title, children, maxWidth = "max-w-5xl" }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
