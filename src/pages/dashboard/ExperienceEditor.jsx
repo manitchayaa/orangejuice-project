@@ -107,23 +107,23 @@ export const ExperienceEditor = () => {
   if (authLoading || loading) return <LoadingSpinner />;
 
   return (
-    <Card>
+    <Card className="p-4 sm:p-6">
       <div className="space-y-6 animate-fade-in-up">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.manageExperience")}</h2>
-        <Button onClick={() => handleOpenModal()} size="sm">+ {t("dashboard.add")}</Button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.manageExperience")}</h2>
+        <Button className="w-full sm:w-auto" onClick={() => handleOpenModal()} size="sm">+ {t("dashboard.add")}</Button>
       </div>
 
       <div className="space-y-4">
         {experience.map((item) => (
           <Card key={item.id} className="p-4">
-            <div className="flex justify-between items-start">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="min-w-0">
                 <h3 className="font-bold text-gray-900 dark:text-white">{item.position_en || item.position_th}</h3>
                 <p className="text-sm font-medium text-blue-600">{item.company_en || item.company_th} ({item.type})</p>
                 <p className="text-xs text-gray-500">{item.start_date} - {item.end_date}</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:shrink-0">
                 <button onClick={() => handleOpenModal(item)} className="p-2.5 text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 rounded-full transition-colors border border-blue-100 dark:border-blue-500/20 shadow-sm" title={lang === "th" ? "แก้ไข" : "Edit"}>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                 </button>
@@ -139,7 +139,7 @@ export const ExperienceEditor = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingItem ? (lang === "th" ? "แก้ไขประสบการณ์" : "Edit Experience") : (lang === "th" ? "เพิ่มประสบการณ์" : "Add Experience")}>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="flex border-b border-gray-200 dark:border-gray-800 mb-4">
+          <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-800 mb-4">
             <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "en" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("en")}>{lang === "th" ? "ภาษาอังกฤษ" : "English"}</button>
             <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "th" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("th")}>{lang === "th" ? "ภาษาไทย" : "Thai"}</button>
           </div>
@@ -177,9 +177,9 @@ export const ExperienceEditor = () => {
             <Input label={lang === "th" ? "รายละเอียดงาน (TH)" : "Description (TH)"} type="textarea" name="description_th" value={formData.description_th} onChange={handleChange} />
           )}
           
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>{t("dashboard.cancel")}</Button>
-            <Button type="submit">{t("dashboard.save")}</Button>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+            <Button className="w-full sm:w-auto" type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>{t("dashboard.cancel")}</Button>
+            <Button className="w-full sm:w-auto" type="submit">{t("dashboard.save")}</Button>
           </div>
         </form>
       </Modal>

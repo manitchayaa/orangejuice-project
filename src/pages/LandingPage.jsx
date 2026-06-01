@@ -20,17 +20,17 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col justify-center overflow-auto px-4 mt-16">
+    <div className="min-h-screen flex flex-col overflow-x-hidden px-4 pt-20 pb-8 sm:px-6 lg:px-8">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center flex-1">
+      <section className="flex flex-col items-center justify-center text-center flex-1 py-10 sm:py-14 lg:py-16">
         <div className="max-w-3xl space-y-6 animate-fade-in-up">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500">
               {t("landing.title")}
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             {t("landing.subtitle")}
           </p>
 
@@ -44,10 +44,10 @@ export const LandingPage = () => {
 
       {/* Features Section */}
       <section
-        className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6  animate-fade-in-up items-center "
+        className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fade-in-up items-stretch"
         style={{ animationDelay: "0.2s" }}
       >
-        <div className="bg-white dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center">
+        <div className="bg-white dark:bg-gray-900/50 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center">
           <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +74,7 @@ export const LandingPage = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center">
+        <div className="bg-white dark:bg-gray-900/50 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center">
           <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
              <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@ export const LandingPage = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center">
+        <div className="bg-white dark:bg-gray-900/50 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center sm:col-span-2 lg:col-span-1">
          <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
            <svg
               xmlns="http://www.w3.org/2000/svg"

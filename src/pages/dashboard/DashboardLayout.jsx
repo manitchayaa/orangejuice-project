@@ -50,13 +50,13 @@ export const DashboardLayout = () => {
   ];
 
   return (
-    <div className="flex items-start gap-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-up">
-      <div className="flex flex-col md:flex-row gap-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 animate-fade-in-up">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
         {/* Sidebar */}
-        <div className="w-full md:w-64 shrink-0">
+        <div className="w-full lg:w-64 shrink-0">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 Dashboard
               </h2>
 
@@ -65,14 +65,14 @@ export const DashboardLayout = () => {
               </p>
             </div>
 
-            <nav className="p-3 space-y-1">
+            <nav className="p-3 flex gap-2 overflow-x-auto lg:block lg:space-y-1">
               {navItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   end={item.exact}
                   className={({ isActive }) =>
-                    `flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                    `shrink-0 whitespace-nowrap flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${
                       isActive
                         ? "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -83,14 +83,14 @@ export const DashboardLayout = () => {
                 </NavLink>
               ))}
 
-              <div className="my-2 border-t border-gray-100 dark:border-gray-800" />
+              <div className="hidden lg:block my-2 border-t border-gray-100 dark:border-gray-800" />
 
               {user.user_metadata?.username && (
                 <button
                   onClick={() =>
                     navigate(`/portfolio/${user.user_metadata.username}`)
                   }
-                  className="w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  className="shrink-0 whitespace-nowrap lg:w-full flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -113,11 +113,10 @@ export const DashboardLayout = () => {
             </nav>
           </div>
         </div>
-      </div>
-
-      {/* Main Content Area */}
-     <div className="flex-1 min-w-0 overflow-x-hidden">
-        <Outlet />
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0 overflow-x-hidden">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

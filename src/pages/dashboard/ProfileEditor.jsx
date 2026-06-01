@@ -201,12 +201,12 @@ const ProfileEditor = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <Card className="animate-fade-in-up">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.editProfile")}</h2>
+    <Card className="animate-fade-in-up p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("dashboard.editProfile")}</h2>
         {formData.username && (
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => window.open(`/portfolio/${formData.username}`, '_blank')}>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button className="w-full sm:w-auto" variant="secondary" size="sm" onClick={() => window.open(`/portfolio/${formData.username}`, '_blank')}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
@@ -217,7 +217,7 @@ const ProfileEditor = () => {
         )}
       </div>
       {message && (
-        <div className={`fixed top-24 right-6 z-50 p-4 rounded-xl shadow-lg border animate-fade-in-up ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-gray-800 dark:border-green-900/50 dark:text-green-400' : 'bg-red-50 border-red-200 text-red-700 dark:bg-gray-800 dark:border-red-900/50 dark:text-red-400'}`}>
+        <div className={`fixed left-4 right-4 top-20 z-50 p-4 rounded-xl shadow-lg border animate-fade-in-up sm:left-auto sm:right-6 sm:top-24 sm:max-w-md ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-gray-800 dark:border-green-900/50 dark:text-green-400' : 'bg-red-50 border-red-200 text-red-700 dark:bg-gray-800 dark:border-red-900/50 dark:text-red-400'}`}>
           <div className="flex items-center gap-3">
             {message.type === 'success' ? (
                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -234,21 +234,21 @@ const ProfileEditor = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Avatar Upload */}
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+          <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
             {avatarPreview ? (
               <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
               <svg className="w-full h-full text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             )}
           </div>
-          <div>
+          <div className="min-w-0">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{lang === "th" ? "รูปโปรไฟล์" : "Profile Picture"}</label>
-            <input type="file" accept="image/*" onChange={handleAvatarChange} className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900/30 dark:file:text-purple-400 cursor-pointer" />
+            <input type="file" accept="image/*" onChange={handleAvatarChange} className="w-full max-w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900/30 dark:file:text-purple-400 cursor-pointer" />
           </div>
         </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 sm:gap-6">
           <Input className="md:col-span-3" label={lang === "th" ? "ชื่อผู้ใช้ (URL Slug)" : "Username (URL Slug)"} name="username" value={formData.username} onChange={handleChange} required />
           <Input className="md:col-span-3" label={lang === "th" ? "อีเมล" : "Email"} type="email" name="email" value={formData.email} onChange={handleChange} />
           <Input className="md:col-span-3" label={lang === "th" ? "เบอร์โทรศัพท์" : "Phone"} name="phone" value={formData.phone} onChange={handleChange} />
@@ -267,7 +267,7 @@ const ProfileEditor = () => {
             </label>
           </div>
 
-          <div className="flex border-b border-gray-200 dark:border-gray-800 md:col-span-6">
+          <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-800 md:col-span-6">
             <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "en" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("en")}>{lang === "th" ? "ภาษาอังกฤษ" : "English"}</button>
             <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "th" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("th")}>{lang === "th" ? "ภาษาไทย" : "Thai"}</button>
           </div>
@@ -298,7 +298,7 @@ const ProfileEditor = () => {
         </div>
 
         <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
-          <Button type="submit" disabled={saving}>
+          <Button className="w-full sm:w-auto" type="submit" disabled={saving}>
             {saving ? (lang === "th" ? "กำลังบันทึก..." : "Saving...") : t("dashboard.save")}
           </Button>
         </div>
