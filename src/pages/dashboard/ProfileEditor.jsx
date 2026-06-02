@@ -31,9 +31,87 @@ const scrollToTop = () => {
   });
 };
 
+const normalizeList = (items) =>
+  [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+
+const ChipInput = ({ label, value, onChange, placeholder, addLabel, className }) => {
+  const [inputValue, setInputValue] = useState("");
+
+  const addItem = () => {
+    if (!inputValue.trim()) return;
+    const nextItems = normalizeList([...value, inputValue]);
+    onChange(nextItems);
+    setInputValue("");
+  };
+
+  const removeItem = (itemToRemove) => {
+    onChange(value.filter((item) => item !== itemToRemove));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addItem();
+    }
+  };
+
+  return (
+    <div className={`flex flex-col space-y-1.5 ${className || "w-full"}`}>
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</label>
+      <div className="w-full min-h-[46px] px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-purple-500 transition-colors">
+        <div className="flex flex-wrap items-center gap-2">
+          {value.map((item) => (
+            <span key={item} className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300 border border-purple-100 dark:border-purple-500/20 px-3 py-1 text-sm font-semibold">
+              {item}
+              <button
+                type="button"
+                onClick={() => removeItem(item)}
+                className="text-purple-500 hover:text-purple-800 dark:hover:text-purple-200 font-bold ml-1"
+                aria-label={`Remove ${item}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={value.length ? "" : placeholder}
+            className="min-w-[160px] flex-1 bg-transparent py-1 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={addItem}
+            disabled={!inputValue.trim()}
+            className="rounded-full px-3 py-1 text-xs font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 cursor-pointer"
+          >
+            {addLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const createProfileFormData = (profile = {}) => {
   const thaiName = splitFullName(profile.full_name_th || "");
   const englishName = splitFullName(profile.full_name_en || "");
+
+  const parseTitleList = (titleField) => {
+    if (!titleField) return [];
+    const val = String(titleField).trim();
+    if (val.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        // fallback
+      }
+    }
+    return val.split(",").map(s => s.trim()).filter(Boolean);
+  };
 
   return {
     username: profile.username || "",
@@ -41,8 +119,8 @@ const createProfileFormData = (profile = {}) => {
     last_name_th: profile.last_name_th || thaiName.lastName,
     first_name_en: profile.first_name_en || englishName.firstName,
     last_name_en: profile.last_name_en || englishName.lastName,
-    title_th: profile.title_th || "",
-    title_en: profile.title_en || "",
+    title_th: parseTitleList(profile.title_th || ""),
+    title_en: parseTitleList(profile.title_en || ""),
     bio_th: profile.bio_th || "",
     bio_en: profile.bio_en || "",
     email: profile.email || "",
@@ -69,7 +147,7 @@ const ProfileEditor = () => {
     username: "",
     first_name_th: "", last_name_th: "",
     first_name_en: "", last_name_en: "",
-    title_th: "", title_en: "",
+    title_th: [], title_en: [],
     bio_th: "", bio_en: "",
     email: "", phone: "",
     location_th: "", location_en: "",
@@ -78,6 +156,8 @@ const ProfileEditor = () => {
   
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [cvFile, setCvFile] = useState(null);
+  const [cvUrl, setCvUrl] = useState("");
 
   useEffect(() => {
     async function loadProfile() {
@@ -94,6 +174,7 @@ const ProfileEditor = () => {
           setFormData(createProfileFormData(profile));
         }
         setAvatarPreview(profile.avatar_url || "");
+        setCvUrl(profile.cv_url || "");
       } catch (error) {
         console.error("Error loading profile:", error);
       } finally {
@@ -125,6 +206,19 @@ const ProfileEditor = () => {
     if (file) {
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
+      setIsDirty(true);
+    }
+  };
+
+  const handleCvChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setMessage({ type: "error", text: lang === "th" ? "กรุณาอัปโหลดไฟล์ PDF เท่านั้น" : "Please upload a PDF file only." });
+        return;
+      }
+      setCvFile(file);
+      setIsDirty(true);
     }
   };
 
@@ -151,12 +245,22 @@ const ProfileEditor = () => {
         avatar_url = storageService.getPublicUrl("avatars", filePath);
       }
 
+      let uploaded_cv_url = cvUrl;
+      if (cvFile) {
+        const fileExt = cvFile.name.split('.').pop();
+        const filePath = `${user.id}/cv.${fileExt}`;
+        await storageService.uploadFile("cvs", filePath, cvFile);
+        uploaded_cv_url = storageService.getPublicUrl("cvs", filePath);
+        setCvUrl(uploaded_cv_url);
+        setCvFile(null); // Clear CV file upload state after successful upload
+      }
+
       const profilePayload = {
         username: formData.username,
         full_name_th: joinFullName(formData.first_name_th, formData.last_name_th),
         full_name_en: joinFullName(formData.first_name_en, formData.last_name_en),
-        title_th: formData.title_th,
-        title_en: formData.title_en,
+        title_th: JSON.stringify(formData.title_th),
+        title_en: JSON.stringify(formData.title_en),
         bio_th: formData.bio_th,
         bio_en: formData.bio_en,
         email: formData.email,
@@ -169,6 +273,7 @@ const ProfileEditor = () => {
       await profileService.updateProfile(user.id, {
         ...profilePayload,
         avatar_url,
+        cv_url: uploaded_cv_url,
       });
 
       sessionStorage.removeItem("profile_draft_v2");
@@ -248,6 +353,46 @@ const ProfileEditor = () => {
           </div>
         </div>
 
+        {/* CV PDF Upload */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-150 dark:border-gray-800">
+          <div className="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div className="min-w-0 flex-1">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+              {lang === "th" ? "อัปโหลด Resume / CV (ไฟล์ PDF)" : "Upload Resume / CV (PDF File)"}
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <input 
+                type="file" 
+                accept="application/pdf" 
+                onChange={handleCvChange} 
+                className="text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900/30 dark:file:text-purple-400 cursor-pointer" 
+              />
+              {cvFile && (
+                <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                  {cvFile.name}
+                </span>
+              )}
+              {cvUrl && !cvFile && (
+                <a 
+                  href={cvUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-xs font-semibold text-purple-600 dark:text-purple-450 hover:underline inline-flex items-center gap-1 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-2xs transition-colors hover:bg-gray-50"
+                >
+                  {lang === "th" ? "ดูไฟล์ CV ปัจจุบัน" : "View current CV"}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+
          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 sm:gap-6">
           <Input className="md:col-span-3" label={lang === "th" ? "ชื่อผู้ใช้ (URL Slug)" : "Username (URL Slug)"} name="username" value={formData.username} onChange={handleChange} required />
           <Input className="md:col-span-3" label={lang === "th" ? "อีเมล" : "Email"} type="email" name="email" value={formData.email} onChange={handleChange} />
@@ -276,14 +421,34 @@ const ProfileEditor = () => {
             <>
               <Input className="md:col-span-3" label={lang === "th" ? "ชื่อ (EN)" : "First Name (EN)"} name="first_name_en" value={formData.first_name_en} onChange={handleChange} required />
               <Input className="md:col-span-3" label={lang === "th" ? "นามสกุล (EN)" : "Last Name (EN)"} name="last_name_en" value={formData.last_name_en} onChange={handleChange} required />
-              <Input className="md:col-span-3" label={lang === "th" ? "ตำแหน่งงาน (EN)" : "Job Title (EN)"} name="title_en" value={formData.title_en} onChange={handleChange} placeholder="e.g. System Engineer" />
+              <ChipInput
+                className="md:col-span-3"
+                label={lang === "th" ? "ตำแหน่งงาน (EN)" : "Job Title (EN)"}
+                value={formData.title_en}
+                onChange={(nextList) => {
+                  setFormData(prev => ({ ...prev, title_en: nextList }));
+                  setIsDirty(true);
+                }}
+                placeholder="e.g. System Engineer"
+                addLabel={lang === "th" ? "เพิ่ม" : "Add"}
+              />
               <Input className="md:col-span-3" label={lang === "th" ? "สถานที่อยู่ (EN)" : "Location (EN)"} name="location_en" value={formData.location_en} onChange={handleChange} />
             </>
           ) : (
             <>
               <Input className="md:col-span-3" label={lang === "th" ? "ชื่อ (TH)" : "First Name (TH)"} name="first_name_th" value={formData.first_name_th} onChange={handleChange} />
               <Input className="md:col-span-3" label={lang === "th" ? "นามสกุล (TH)" : "Last Name (TH)"} name="last_name_th" value={formData.last_name_th} onChange={handleChange} />
-              <Input className="md:col-span-3" label={lang === "th" ? "ตำแหน่งงาน (TH)" : "Job Title (TH)"} name="title_th" value={formData.title_th} onChange={handleChange} placeholder="เช่น วิศวกรระบบ" />
+              <ChipInput
+                className="md:col-span-3"
+                label={lang === "th" ? "ตำแหน่งงาน (TH)" : "Job Title (TH)"}
+                value={formData.title_th}
+                onChange={(nextList) => {
+                  setFormData(prev => ({ ...prev, title_th: nextList }));
+                  setIsDirty(true);
+                }}
+                placeholder="เช่น วิศวกรระบบ"
+                addLabel={lang === "th" ? "เพิ่ม" : "Add"}
+              />
               <Input className="md:col-span-3" label={lang === "th" ? "สถานที่อยู่ (TH)" : "Location (TH)"} name="location_th" value={formData.location_th} onChange={handleChange} />
             </>
           )}

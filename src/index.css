@@ -64,3 +64,16 @@ body {
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out forwards;
 }
+
+@keyframes slideTimer {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-slide-timer {
+  animation: slideTimer 4s linear infinite;
+}

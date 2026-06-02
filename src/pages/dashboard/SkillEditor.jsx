@@ -15,7 +15,6 @@ const SkillEditor = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [formTab, setFormTab] = useState("en");
   const [formData, setFormData] = useState({
     name: "",
     category_en: "",
@@ -55,16 +54,16 @@ const SkillEditor = () => {
       setEditingItem(item);
       setFormData({
         name: item.name || "",
-        category_en: item.category_en || "",
-        category_th: item.category_th || "",
+        category_en: item.category_en || "Technical Skills",
+        category_th: item.category_th || "ทักษะทางเทคนิค",
         proficiency: item.proficiency || 50,
       });
     } else {
       setEditingItem(null);
       setFormData({
         name: "",
-        category_en: "",
-        category_th: "",
+        category_en: "Technical Skills",
+        category_th: "ทักษะทางเทคนิค",
         proficiency: 50,
       });
     }
@@ -138,19 +137,32 @@ const SkillEditor = () => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingItem ? (lang === "th" ? "แก้ไขทักษะ" : "Edit Skill") : (lang === "th" ? "เพิ่มทักษะ" : "Add Skill")}>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          
-          <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-800 mb-4">
-            <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "en" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("en")}>{lang === "th" ? "ภาษาอังกฤษ" : "English"}</button>
-            <button type="button" className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${formTab === "th" ? "border-purple-500 text-purple-600 dark:text-purple-400" : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`} onClick={() => setFormTab("th")}>{lang === "th" ? "ภาษาไทย" : "Thai"}</button>
-          </div>
-
           <Input label={lang === "th" ? "ชื่อทักษะ" : "Skill Name"} name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. React" />
           
-          {formTab === "en" ? (
-            <Input label={lang === "th" ? "หมวดหมู่ (EN)" : "Category (EN)"} name="category_en" value={formData.category_en} onChange={handleChange} placeholder="e.g. Technical Skills" />
-          ) : (
-            <Input label={lang === "th" ? "หมวดหมู่ (TH)" : "Category (TH)"} name="category_th" value={formData.category_th} onChange={handleChange} placeholder="e.g. ทักษะทางเทคนิค" />
-          )}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {lang === "th" ? "หมวดหมู่ทักษะ" : "Skill Category"}
+            </label>
+            <select
+              value={formData.category_en === "Soft Skills" ? "soft" : "technical"}
+              onChange={(e) => {
+                const isSoft = e.target.value === "soft";
+                setFormData(prev => ({
+                  ...prev,
+                  category_en: isSoft ? "Soft Skills" : "Technical Skills",
+                  category_th: isSoft ? "ทักษะการทำงาน" : "ทักษะทางเทคนิค"
+                }));
+              }}
+              className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+            >
+              <option value="technical">
+                {lang === "th" ? "ทักษะทางเทคนิค (Technical Skills)" : "Technical Skills"}
+              </option>
+              <option value="soft">
+                {lang === "th" ? "ทักษะการทำงาน (Soft Skills)" : "Soft Skills"}
+              </option>
+            </select>
+          </div>
 
           
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">

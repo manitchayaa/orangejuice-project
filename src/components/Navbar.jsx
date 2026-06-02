@@ -17,7 +17,8 @@ export const Navbar = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const isPortfolioView = location.pathname.startsWith("/portfolio/") && username;
+  const isPortfolioView = location.pathname.startsWith("/portfolio/");
+  const pathUsername = isPortfolioView ? location.pathname.split("/")[2] : null;
   const isDashboard = location.pathname.startsWith("/dashboard");
 
   useEffect(() => {
@@ -42,14 +43,39 @@ export const Navbar = () => {
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           
           {/* Logo & Portfolio Navigation */}
-          <div className="flex items-center gap-3 sm:gap-8">
+          <div className="flex items-center gap-2 sm:gap-6 flex-1 min-w-0 mr-4">
             <div 
               onClick={() => navigate("/")}
-              className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 cursor-pointer"
+              className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 cursor-pointer shrink-0"
             >
               Portfolios
             </div>
 
+            {isPortfolioView && pathUsername && (
+              <div className="flex gap-1 overflow-x-auto scrollbar-hide py-1 border-l border-gray-200 dark:border-gray-800 pl-3 sm:pl-5">
+                {[
+                  { to: `/portfolio/${pathUsername}`, label: t("nav.home"), end: true },
+                  { to: `/portfolio/${pathUsername}/resume`, label: t("nav.resume") },
+                  { to: `/portfolio/${pathUsername}/project`, label: t("nav.project") },
+                  { to: `/portfolio/${pathUsername}/certificate`, label: t("nav.certificate") },
+                ].map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `whitespace-nowrap px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shrink-0 ${
+                        isActive
+                          ? "bg-purple-600 text-white shadow-xs"
+                          : "text-gray-500 hover:bg-gray-100 hover:text-gray-950 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Actions */}
