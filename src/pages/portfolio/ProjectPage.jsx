@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "../../hooks/useTranslation";
-import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Modal } from "../../components/ui/Modal";
 import { helpers } from "../../utils/helpers";
@@ -100,9 +99,13 @@ export const ProjectPage = () => {
           const tags = helpers.parseJSON(project.tags, []);
           
           return (
-            <Card key={project.id} hover onClick={() => handleOpenDetail(project)} className="flex flex-col h-full group overflow-hidden p-0 cursor-pointer shadow-sm hover:shadow-md transition-all">
+            <div 
+              key={project.id} 
+              onClick={() => handleOpenDetail(project)} 
+              className="flex flex-col h-full group overflow-hidden p-0 cursor-pointer rounded-3xl border border-gray-200 dark:border-gray-800 bg-transparent hover:border-purple-500/30 dark:hover:border-purple-500/20 hover:shadow-[0_8px_30px_rgba(168,85,247,0.02)] hover:scale-[1.01] transition-all duration-300"
+            >
               {project.image_url ? (
-                <div className="w-full h-48 overflow-hidden bg-gray-150 dark:bg-gray-850/80 relative animate-pulse">
+                <div className="w-full h-48 overflow-hidden bg-gray-150/40 dark:bg-gray-900/30 relative animate-pulse">
                   <img 
                     src={project.image_url} 
                     alt={getLocalized(project, 'title')} 
@@ -114,7 +117,7 @@ export const ProjectPage = () => {
                   />
                 </div>
               ) : (
-                <div className="w-full h-48 bg-purple-50 dark:bg-gray-800/20 flex items-center justify-center border-b border-gray-100 dark:border-gray-800 text-gray-400">
+                <div className="w-full h-48 bg-purple-50/30 dark:bg-gray-900/10 flex items-center justify-center border-b border-gray-100 dark:border-gray-800 text-gray-400">
                   No Image
                 </div>
               )}
@@ -128,14 +131,14 @@ export const ProjectPage = () => {
                     <Badge key={i} variant="tag">{tag}</Badge>
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">
+                <p className="text-gray-650 dark:text-gray-400 text-sm line-clamp-3 mb-4 flex-grow leading-relaxed">
                   {getLocalized(project, 'description')}
                 </p>
                 <div className="flex items-center text-purple-600 dark:text-purple-400 font-medium text-sm mt-auto">
                   {t("project.seeDetail")} <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </div>
-            </Card>
+            </div>
           );
         })}
         {(!projects || projects.length === 0) && (
