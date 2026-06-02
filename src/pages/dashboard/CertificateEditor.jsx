@@ -142,9 +142,9 @@ export const CertificateEditor = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {certificates.map((item) => (
           <Card key={item.id} className="overflow-hidden flex flex-col">
-            <div className="h-40 w-full bg-gray-200 dark:bg-gray-800">
+            <div className="h-40 w-full bg-gray-200 dark:bg-gray-850">
               {item.image_url ? (
-                <img src={item.image_url} alt="Certificate" className="w-full h-full object-cover" />
+                <img src={item.image_url} alt="Certificate" className="w-full h-full object-contain" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
               )}

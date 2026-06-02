@@ -306,9 +306,9 @@ const ProjectEditor = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((item) => (
           <Card key={item.id} className="overflow-hidden flex flex-col">
-            <div className="h-48 w-full bg-gray-200 dark:bg-gray-800">
+            <div className="h-48 w-full bg-gray-200 dark:bg-gray-850">
               {item.image_url ? (
-                <img src={item.image_url} alt="Project" className="w-full h-full object-cover" />
+                <img src={item.image_url} alt="Project" className="w-full h-full object-contain" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
               )}
@@ -367,8 +367,8 @@ const ProjectEditor = () => {
             {imageItems.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
                 {imageItems.map((item, index) => (
-                  <div key={item.id} className="relative group rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 aspect-video flex items-center justify-center shadow-sm">
-                    <img src={item.url} alt="Preview" className="w-full h-full object-cover" />
+                  <div key={item.id} className="relative group rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-850 border border-gray-200 dark:border-gray-800 aspect-video flex items-center justify-center shadow-sm">
+                    <img src={item.url} alt="Preview" className="w-full h-full object-contain" />
                     
                     {index === 0 && (
                       <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-purple-600 text-white shadow-sm z-20">

@@ -102,11 +102,11 @@ export const ProjectPage = () => {
           return (
             <Card key={project.id} hover onClick={() => handleOpenDetail(project)} className="flex flex-col h-full group overflow-hidden p-0 cursor-pointer shadow-sm hover:shadow-md transition-all">
               {project.image_url ? (
-                <div className="w-full h-48 overflow-hidden bg-gray-150 dark:bg-gray-800 relative animate-pulse">
+                <div className="w-full h-48 overflow-hidden bg-gray-150 dark:bg-gray-850/80 relative animate-pulse">
                   <img 
                     src={project.image_url} 
                     alt={getLocalized(project, 'title')} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-0 transition-opacity duration-300"
+                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02] opacity-0 transition-opacity duration-300"
                     onLoad={(e) => {
                       e.target.classList.remove('opacity-0');
                       e.target.parentElement.classList.remove('animate-pulse');

@@ -141,7 +141,7 @@ export const HomePage = () => {
                     <img
                       src={project.image_url || `https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800`}
                       alt={getLocalized(project, 'title')}
-                      className="w-full h-full object-cover select-none"
+                      className="w-full h-full object-contain select-none"
                     />
                     
                     {/* Indicators Overlay */}
