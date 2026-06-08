@@ -45,7 +45,7 @@ export const Navbar = () => {
           {/* Logo & Portfolio Navigation */}
           <div className="flex items-center gap-2 sm:gap-6 flex-1 min-w-0 mr-4">
             <div 
-              onClick={() => navigate("/")}
+              onClick={() => navigate(isPortfolioView && pathUsername ? `/portfolio/${pathUsername}` : "/")}
               className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-500 cursor-pointer shrink-0"
             >
               Portfolios
@@ -66,8 +66,8 @@ export const Navbar = () => {
                     className={({ isActive }) =>
                       `whitespace-nowrap px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors shrink-0 ${
                         isActive
-                          ? "bg-purple-600 text-white shadow-xs"
-                          : "text-gray-500 hover:bg-gray-100 hover:text-gray-950 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                           ? "bg-purple-600 text-white shadow-xs"
+                           : "text-gray-500 hover:bg-gray-100 hover:text-gray-950 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -83,57 +83,61 @@ export const Navbar = () => {
             <ThemeToggle />
             <LangToggle />
             
-            <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
+            {!isPortfolioView && (
+              <>
+                <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
 
-            {user ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 sm:pl-2 sm:pr-4 sm:py-1.5 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                >
-                  <img 
-                    src={user.user_metadata?.avatar_url || "https://ui-avatars.com/api/?name=" + (user.user_metadata?.full_name || "User")} 
-                    alt="avatar" 
-                    className="w-6 h-6 rounded-full"
-                  />
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[100px] truncate">
-                    {user.user_metadata?.full_name || "User"}
-                  </span>
-                </button>
-
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg py-1 overflow-hidden">
+                {user ? (
+                  <div className="relative" ref={dropdownRef}>
                     <button
-                      onClick={() => { setDropdownOpen(false); navigate("/dashboard"); }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                      onClick={() => setDropdownOpen(!isDropdownOpen)}
+                      className="flex items-center gap-2 p-1.5 sm:pl-2 sm:pr-4 sm:py-1.5 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
-                      {t("nav.dashboard")}
+                      <img 
+                        src={user.user_metadata?.avatar_url || "https://ui-avatars.com/api/?name=" + (user.user_metadata?.full_name || "User")} 
+                        alt="avatar" 
+                        className="w-6 h-6 rounded-full"
+                      />
+                      <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[100px] truncate">
+                        {user.user_metadata?.full_name || "User"}
+                      </span>
                     </button>
-                    {user.user_metadata?.username && (
-                      <button
-                        onClick={() => { setDropdownOpen(false); navigate(`/portfolio/${user.user_metadata.username}`); }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                      >
-                        {t("nav.myPortfolio")}
-                      </button>
+
+                    {isDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg py-1 overflow-hidden">
+                        <button
+                          onClick={() => { setDropdownOpen(false); navigate("/dashboard"); }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                        >
+                          {t("nav.dashboard")}
+                        </button>
+                        {user.user_metadata?.username && (
+                          <button
+                            onClick={() => { setDropdownOpen(false); navigate(`/portfolio/${user.user_metadata.username}`); }}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                          >
+                            {t("nav.myPortfolio")}
+                          </button>
+                        )}
+                        <div className="h-px bg-gray-200 dark:bg-gray-800 my-1"></div>
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
+                        >
+                          {t("nav.logout")}
+                        </button>
+                      </div>
                     )}
-                    <div className="h-px bg-gray-200 dark:bg-gray-800 my-1"></div>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer"
-                    >
-                      {t("nav.logout")}
-                    </button>
                   </div>
+                ) : (
+                  <button
+                    onClick={() => setAuthModalOpen(true)}
+                    className="px-4 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    {t("nav.login")}
+                  </button>
                 )}
-              </div>
-            ) : (
-              <button
-                onClick={() => setAuthModalOpen(true)}
-                className="px-4 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                {t("nav.login")}
-              </button>
+              </>
             )}
           </div>
         </div>

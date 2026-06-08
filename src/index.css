@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-gray-55: #f8f9fa;
+  --color-gray-150: #eceef1;
+  --color-gray-250: #dadde2;
+  --color-gray-850: #101018;
+}
+
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {

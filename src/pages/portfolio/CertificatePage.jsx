@@ -23,10 +23,10 @@ export const CertificatePage = () => {
         {certificates?.map((cert) => (
             <div 
               key={cert.id} 
-              className="flex flex-col h-full overflow-hidden p-0 group relative border border-gray-250 dark:border-gray-800 bg-transparent rounded-3xl hover:border-purple-500/30 dark:hover:border-purple-500/20 hover:shadow-[0_8px_30px_rgba(168,85,247,0.02)] hover:scale-[1.01] transition-all duration-300"
+              className="flex flex-col h-full overflow-hidden p-0 group relative border border-gray-200/60 dark:border-gray-800 bg-transparent rounded-3xl hover:border-purple-500/30 dark:hover:border-purple-500/20 hover:shadow-[0_8px_30px_rgba(168,85,247,0.02)] hover:scale-[1.01] transition-all duration-300"
             >
               {/* Aspect Ratio [1.414] A4 Landscape Ratio with Contain Image */}
-              <div className="w-full aspect-[1.414] overflow-hidden bg-gray-50/50 dark:bg-gray-900/30 border-b border-gray-150 dark:border-gray-800 relative flex items-center justify-center">
+              <div className="w-full aspect-[1.414] overflow-hidden bg-gray-50/50 dark:bg-gray-900/30 border-b border-gray-200/40 dark:border-gray-800 relative flex items-center justify-center">
                 {cert.image_url ? (
                   <img 
                     src={cert.image_url} 
